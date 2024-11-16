@@ -1,0 +1,126 @@
+/*
+ * Copyright (c) 2024 Daniel Toffetti
+ *
+ * This file is licensed under the MIT License.
+ * You may obtain a copy of the license at:
+ * https://opensource.org/licenses/MIT
+ *
+ * Alternatively, see the LICENSE file included with this source code for the full license text.
+ */
+
+/* General Background */
+.root {
+    /* linear-gradient(to bottom, #e0f7fa, #d1c4e9); Light blue fading into light purple */
+    -fx-background-color: #e0f7fa; /* Light blue */
+}
+
+/* Text Fields */
+.text-field {
+    -fx-background-color: #d1c4e9; /* Light purple background */
+    -fx-text-fill: #37474f; /* Dark blue text */
+    -fx-border-color: #90caf9; /* Light blue border */
+    -fx-border-width: 1px;
+}
+
+/* Labels */
+.label {
+    -fx-text-fill: #37474f; /* Dark blue text */
+    -fx-font-size: 14px;
+}
+
+/* Buttons */
+.button {
+    -fx-background-color: linear-gradient(to bottom, #90caf9, #64b5f6); /* Light blue gradient */
+    /* -fx-text-fill: white; White text */
+    -fx-border-color: #37474f; /* Dark blue border */
+    -fx-border-width: 1px;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+}
+
+.button:hover {
+    -fx-background-color: #64b5f6; /* Slightly darker blue on hover */
+}
+
+/* Toolbar */
+.tool-bar {
+    -fx-background-color: #d1c4e9; /* Light purple toolbar */
+    -fx-border-color: #90caf9;
+    -fx-border-width: 1px;
+}
+
+/* TableView */
+.table-view {
+    -fx-background-color: #e0f7fa; /* Light blue */
+    -fx-control-inner-background: #d1c4e9; /* Light purple inside */
+    -fx-text-fill: #37474f; /* Dark blue text */
+}
+
+/* Progress bar (for waveform or audio progress) */
+.progress-bar {
+    -fx-accent: #64b5f6; /* Light blue progress bar */
+}
+
+.slider .track {
+    -fx-background-color: #d1c4e9; /* Light purple track */
+}
+
+.slider .thumb {
+    -fx-background-color: #64b5f6; /* Light blue thumb */
+}
+
+/* Menu Bar */
+.menu-bar {
+    -fx-background-color: #e0f7fa; /* Light blue */
+    -fx-border-color: #90caf9;
+}
+
+.waveforms-pane {
+    -fx-border-color: blue;
+    -fx-border-width: 2;
+}
+
+
+/* Editable ListView */
+.list-view {
+    -fx-background-color: #d3d3d3; /* Light gray background */
+    -fx-control-inner-background: #d1c4e9; /* Light purple inside */
+    -fx-text-fill: #37474f; /* Dark blue text */
+}
+
+/* Style for each list cell */
+.list-view .list-cell {
+    -fx-background-color: #d1c4e9; /* Light purple */
+    -fx-text-fill: #37474f; /* Dark blue text */
+    -fx-border-color: transparent; /* No border by default */
+    -fx-padding: 5px; /* Padding for spacing */
+}
+
+/* Highlight selected cell */
+.list-view .list-cell:filled:selected {
+    -fx-background-color: #90caf9; /* Light blue for selected */
+    -fx-text-fill: #37474f; /* Keep text dark blue */
+}
+
+/* Hover effect */
+.list-view .list-cell:hover {
+    -fx-background-color: #b3e5fc; /* Slightly lighter blue on hover */
+}
+
+/* Editing state */
+.list-view .list-cell:editing {
+    -fx-background-color: #64b5f6; /* Highlight cell being edited */
+    -fx-border-color: #37474f; /* Dark blue border for clarity */
+    -fx-border-width: 1px;
+    -fx-padding: 3px; /* Adjust padding during edit mode */
+}
+
+/* Text field inside the editable list cell */
+.list-view .list-cell .text-field {
+    -fx-background-color: #ffffff; /* White background for clarity */
+    -fx-text-fill: #37474f; /* Dark blue text */
+    -fx-border-color: #90caf9; /* Light blue border */
+    -fx-border-width: 1px;
+    -fx-border-radius: 3px;
+    -fx-background-radius: 3px;
+}
