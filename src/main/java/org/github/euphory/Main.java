@@ -9,14 +9,15 @@
  */
 package org.github.euphory;
 
+import java.io.IOException;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.image.Image;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.stage.Stage;
-
-import java.io.IOException;
 
 /**
  * @author Daniel Toffetti
@@ -43,7 +44,7 @@ public class Main extends Application {
         Image icon032 = new Image("wave_032.png");
         Image icon016 = new Image("wave_016.png");
         stage.getIcons().addAll(icon512, icon256, icon128, icon064, icon032, icon016);
-        stage.setTitle("Euphory - A tagging and track detector tool for collectors of DJ radio shows");
+        stage.setTitle("Euphory - A tagging and track detector tool for collectors of DJ radio shows.");
         stage.setMaximized(true);
         stage.show();
     }
@@ -60,9 +61,25 @@ public class Main extends Application {
     static public Stage getStage() {
         return Main.stage;
     }
-    
+  
     public static void main(String[] args) {
         launch();
     }
 
+    public static void showAlert(AlertType alertType, String title, String header, String content) {
+        Alert alert = new Alert(alertType);
+        alert.setTitle(title);
+        alert.setHeaderText(header);
+        alert.setContentText(content);
+        alert.initOwner(stage.getScene().getWindow());
+        alert.showAndWait();
+    }
+    
+    public static void appendFileNameToTitle(String fileName) {
+        if (fileName != null && !fileName.isBlank()) {
+            String baseTitle = stage.getTitle().split("\\.")[0];
+            stage.setTitle(baseTitle + ".   -   " + fileName);
+        }
+    }
+    
 }

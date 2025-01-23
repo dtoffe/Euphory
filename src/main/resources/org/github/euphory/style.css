@@ -42,6 +42,10 @@
     -fx-background-color: #64b5f6; /* Slightly darker blue on hover */
 }
 
+.font-icon-red {
+    -fx-fill: red; /* Changes the color of the icon */
+}
+
 /* Toolbar */
 .tool-bar {
     -fx-background-color: #d1c4e9; /* Light purple toolbar */

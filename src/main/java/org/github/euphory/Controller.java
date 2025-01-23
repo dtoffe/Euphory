@@ -15,6 +15,9 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
@@ -27,9 +30,9 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
-import javafx.stage.FileChooser;
-import javafx.stage.FileChooser.ExtensionFilter;
+import javafx.scene.paint.Color;
 import javafx.util.Duration;
+import org.kordamp.ikonli.javafx.FontIcon;
 
 /**
  * @author Daniel Toffetti
@@ -59,7 +62,10 @@ public class Controller {
 
     @FXML
     private Button saveButton;
-
+    
+    @FXML
+    private FontIcon saveIcon;
+    
     @FXML
     private Label runTimeLabel;
 
@@ -68,6 +74,9 @@ public class Controller {
 
     @FXML
     private Slider songSlider;
+    
+    @FXML
+    private Canvas waveFormsCanvas;
     
     @FXML
     private ImageView coverImageView;
@@ -100,12 +109,9 @@ public class Controller {
         coverImageView.setImage(image);
         setControlsEnabled(false);
         
-        // Initialize ListView with items
         editableListView.setItems(items);
-        // Set the ListView to be editable
         editableListView.setCellFactory(TextFieldListCell.forListView());
         editableListView.setEditable(true);
-        // Handle inline editing
         editableListView.setOnEditCommit(event -> {
             int index = event.getIndex();
             String newValue = event.getNewValue();
@@ -115,11 +121,12 @@ public class Controller {
 
     @FXML
     private void openButtonAction(ActionEvent actionEvent) {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Open Mp3 File");
-        fileChooser.getExtensionFilters().addAll(new ExtensionFilter("All Files", "*.mp3"));
-        File file = fileChooser.showOpenDialog(Main.getStage());
-        Media media = new Media(file.toURI().toString());
+        Media media = FileService.openMediaFile();
+        if (media == null) {
+            return;
+        }
+        Main.appendFileNameToTitle(Model.getFileName());
+        
         mediaPlayer = new MediaPlayer(media);
         songSlider.setMin(0);
         mediaPlayer.setOnReady(() -> {
@@ -150,9 +157,21 @@ public class Controller {
                 }
             }
         });
-
+        onContentEdited();
     }
-        
+    
+    @FXML
+    private void analyzeButtonAction(ActionEvent actionEvent) {
+        File file = Model.getMediaFile();
+        if (file != null) {
+            GraphicsContext gc = waveFormsCanvas.getGraphicsContext2D();
+            gc.setFill(Color.BLUE);
+            gc.fillRect(50, 50, 100, 100); // Draw a blue rectangle on the canvas
+        } else {
+            Main.showAlert(Alert.AlertType.INFORMATION, "Info", "Open a media file first", "");
+        }
+    }
+    
     @FXML
     private void rewindButtonAction(ActionEvent actionEvent) {
         mediaPlayer.seek(Duration.seconds(songSlider.getValue() - 5));
@@ -182,9 +201,22 @@ public class Controller {
 
     @FXML
     private void saveButtonAction(ActionEvent actionEvent) {
-        //
+        onContentSaved();
+    }
+    
+    public void onContentEdited() {
+        saveIcon.getStyleClass().add("font-icon-red");
     }
 
+    public void onContentSaved() {
+        saveIcon.getStyleClass().remove("font-icon-red");
+    }
+
+    @FXML
+    private void cueButtonAction(ActionEvent actionEvent) {
+        //
+    }
+    
     @FXML
     private void handleAddItem(ActionEvent actionEvent) {
         String newItem = newItemField.getText().trim();
