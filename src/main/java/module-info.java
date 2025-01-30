@@ -9,9 +9,10 @@
  */
 module org.github.euphory {
     requires java.logging;
-    requires javafx.controls;
+    requires transitive javafx.controls;
     requires javafx.fxml;
-    requires javafx.media;
+    requires transitive javafx.media;
+    requires transitive javafx.graphics;
     requires javafx.swing;
     requires org.kordamp.ikonli.core;
     requires org.kordamp.ikonli.javafx;

@@ -19,6 +19,8 @@ import javafx.scene.media.Media;
 public class Model {
     
     static File currentFile;
+
+    private static AlbumData currentAlbum;
     
     public Model() {
         
@@ -43,4 +45,12 @@ public class Model {
         return null;
     }
     
+    public static void setCurrentAlbum(AlbumData album) {
+        currentAlbum = album;
+    }
+    
+    public static AlbumData getCurrentAlbum() {
+        return currentAlbum;
+    }
+
 }
