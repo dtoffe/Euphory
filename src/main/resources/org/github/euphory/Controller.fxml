@@ -4,18 +4,25 @@
 <?import javafx.scene.canvas.Canvas?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.Slider?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.control.cell.PropertyValueFactory?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.media.MediaView?>
+<?import javafx.util.StringConverter?>
+<?import javafx.util.converter.LocalDateStringConverter?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
 <!--
@@ -97,99 +104,97 @@
             <Canvas fx:id="waveFormsCanvas" width="300" height="200" />
         </Pane>
 
-        <!-- ID3 Data -->
-        <HBox fx:id="id3DataBox" prefHeight="350" VBox.vgrow="NEVER" spacing="10">
-            <Pane fx:id="coverPane" prefWidth="350" prefHeight="350">
+        <!-- Album (Show Episode) metadata -->
+        <HBox fx:id="metaDataBox" prefHeight="350" VBox.vgrow="NEVER" spacing="10">
+
+            <!-- Cover Image -->
+            <Pane fx:id="coverPane" prefWidth="350" prefHeight="350" HBox.hgrow="NEVER">
                 <ImageView fx:id="coverImageView" fitWidth="350" fitHeight="350" preserveRatio="true" />
             </Pane>
 
-            <!-- ID3v1 Section -->
-            <VBox spacing="10" alignment="TOP_LEFT">
-                <Label text="ID3v1.2 Tags" style="-fx-font-size: 16px; -fx-font-weight: bold;" />
+            <!-- Metadata Section -->
+            <VBox spacing="10" alignment="TOP_LEFT" HBox.hgrow="ALWAYS">
                 <HBox spacing="10">
-                    <Label text="Title:"/>
-                    <TextField fx:id="id3v1Title"/>
+                    <Label text="Album Artist:"/>
+                    <TextField fx:id="albumArtist" prefWidth="300" promptText="Enter album artist" />
                 </HBox>
                 <HBox spacing="10">
-                    <Label text="Artist:"/>
-                    <TextField fx:id="id3v1Artist"/>
+                    <Label text="Album Title:"/>
+                    <TextField fx:id="albumTitle" prefWidth="300" promptText="Enter album title" />
                 </HBox>
                 <HBox spacing="10">
-                    <Label text="Album:"/>
-                    <TextField fx:id="id3v1Album"/>
+                    <Label text="Album Subtitle:"/>
+                    <TextField fx:id="albumSubtitle" prefWidth="300" promptText="Enter album subtitle" />
                 </HBox>
                 <HBox spacing="10">
-                    <Label text="Year:"/>
-                    <TextField fx:id="id3v1Year"/>
+                    <Label text="Episode #:"/>
+                    <TextField fx:id="albumEpisode" prefWidth="50" promptText="Ep. #" />
+                    <Label text="Date:"/>
+                    <DatePicker fx:id="albumDate" promptText="Enter date (yyyy-mm-dd)">
+                        <converter>
+                            <javafx.util.converter.LocalDateStringConverter />
+                        </converter>
+                    </DatePicker>
+                </HBox>
+                
+                <Separator orientation="HORIZONTAL" />
+
+                <!-- Tracks Metadata -->
+                <HBox spacing="10">
+                    <Label text="Track Artist:"/>
+                    <TextField fx:id="trackArtist" prefWidth="300" promptText="Enter track artist" />
                 </HBox>
                 <HBox spacing="10">
-                    <Label text="Comment:"/>
-                    <TextField fx:id="id3v1Comment"/>
+                    <Label text="Track Title:"/>
+                    <TextField fx:id="trackTitle" prefWidth="300" promptText="Enter track title" />
                 </HBox>
                 <HBox spacing="10">
-                    <Label text="Track:"/>
-                    <TextField fx:id="id3v1Track"/>
-                </HBox>
-                <HBox spacing="10">
-                    <Label text="Genre:"/>
-                    <ComboBox fx:id="id3v1Genre">
-                        <!-- Genre options can be added here -->
-                    </ComboBox>
+                    <Label text="Track #:"/>
+                    <TextField fx:id="trackNumber" prefWidth="50" promptText="Tr. #" />
+                    <Label text="Enter Start Time:"/>
+                    <TextField fx:id="startTime" prefWidth="100" promptText="Enter start time" />
+                    <Button text="Add Track" onAction="#handleAddTrack" />
                 </HBox>
             </VBox>
 
-            <!-- ID3v2.4 Section -->
-            <VBox spacing="10" alignment="TOP_LEFT">
-                <Label text="ID3v2.4 Tags" style="-fx-font-size: 16px; -fx-font-weight: bold;" />
-                <HBox spacing="10">
-                    <Label text="Title (TIT2):"/>
-                    <TextField fx:id="id3v24Title"/>
-                </HBox>
-                <HBox spacing="10">
-                    <Label text="Artist (TPE1):"/>
-                    <TextField fx:id="id3v24Artist"/>
-                </HBox>
-                <HBox spacing="10">
-                    <Label text="Album (TALB):"/>
-                    <TextField fx:id="id3v24Album"/>
-                </HBox>
-                <HBox spacing="10">
-                    <Label text="Track Number (TRCK):"/>
-                    <TextField fx:id="id3v24TrackNumber"/>
-                </HBox>
-                <HBox spacing="10">
-                    <Label text="Year (TDRC):"/>
-                    <TextField fx:id="id3v24Year"/>
-                </HBox>
-                <HBox spacing="10">
-                    <Label text="Genre (TCON):"/>
-                    <TextField fx:id="id3v24Genre"/>
-                </HBox>
-                <HBox spacing="10">
-                    <Label text="Comment (COMM):"/>
-                    <TextField fx:id="id3v24Comment"/>
-                </HBox>
-                <HBox spacing="10">
-                    <Label text="Album Artist (TPE2):"/>
-                    <TextField fx:id="id3v24AlbumArtist"/>
-                </HBox>
-            </VBox>
+            <!-- Tracks Section -->
+            <VBox spacing="10" alignment="TOP_LEFT" HBox.hgrow="ALWAYS">
+                <TableView fx:id="dataTableView" prefHeight="200" prefWidth="700">
+                    <columns>
+                        <!-- Artist Column -->
+                        <TableColumn fx:id="artistColumn" text="Artist" prefWidth="300">
+                            <cellValueFactory>
+                                <PropertyValueFactory property="artist"/>
+                            </cellValueFactory>
+                        </TableColumn>
 
-            <!-- ID3v2.4 Chapters -->
-            <VBox spacing="10" alignment="TOP_LEFT">
-                <Label text="ID3v2.4 Chapters" style="-fx-font-size: 16px; -fx-font-weight: bold;" />
-                <ListView fx:id="editableListView" editable="true" prefHeight="200" prefWidth="300">
-                    <!-- Placeholder for empty list -->
+                        <!-- Title Column -->
+                        <TableColumn fx:id="titleColumn" text="Title" prefWidth="300">
+                            <cellValueFactory>
+                                <PropertyValueFactory property="title"/>
+                            </cellValueFactory>
+                        </TableColumn>
+
+                        <!-- Track Number Column -->
+                        <TableColumn fx:id="trackNumberColumn" text="Track" prefWidth="50">
+                            <cellValueFactory>
+                                <PropertyValueFactory property="trackNumber"/>
+                            </cellValueFactory>
+                        </TableColumn>
+
+                        <!-- Start Time Column -->
+                        <TableColumn fx:id="startTimeColumn" text="Start" prefWidth="50">
+                            <cellValueFactory>
+                                <PropertyValueFactory property="startTime"/>
+                            </cellValueFactory>
+                        </TableColumn>
+                    </columns>
+
+                    <!-- Placeholder for empty table -->
                     <placeholder>
                         <Label text="No items yet" />
                     </placeholder>
-                </ListView>
-
-                <!-- Controls for adding items -->
-                <HBox spacing="10">
-                    <TextField fx:id="newItemField" promptText="Enter new item" />
-                    <Button text="Add" onAction="#handleAddItem" />
-                </HBox>
+                </TableView>
             </VBox>
 
         </HBox>

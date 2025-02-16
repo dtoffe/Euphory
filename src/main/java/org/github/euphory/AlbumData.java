@@ -10,6 +10,8 @@
 package org.github.euphory;
 
 import java.util.ArrayList;
+import java.util.Date;
+
 import javafx.scene.image.Image;
 
 /**
@@ -20,7 +22,9 @@ public class AlbumData {
     
     private String artist;
     private String title;
+    private String subTitle;
     private int episode;
+    private Date date;
     private ArrayList<TrackData> tracks;
     private Image coverImage;
     private String fileName;
@@ -51,12 +55,28 @@ public class AlbumData {
         this.title = title;
     }
 
+    public String getSubTitle() {
+        return subTitle;
+    }    
+
+    public void setSubTitle(String subTitle) {
+        this.subTitle = subTitle;
+    }
+    
     public int getEpisode() {
         return episode;
     }
 
     public void setEpisode(int episode) {
         this.episode = episode;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
     }
 
     public Image getCoverImage() {

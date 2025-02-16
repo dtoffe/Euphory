@@ -17,6 +17,7 @@ module org.github.euphory {
     requires org.kordamp.ikonli.core;
     requires org.kordamp.ikonli.javafx;
     requires org.kordamp.ikonli.fontawesome5;
+    requires javafx.base;
 
     opens org.github.euphory to javafx.fxml;
     exports org.github.euphory;

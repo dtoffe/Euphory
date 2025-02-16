@@ -10,9 +10,10 @@
 package org.github.euphory;
 
 import java.io.File;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
 import javafx.beans.Observable;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
@@ -20,11 +21,11 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Control;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
 import javafx.scene.control.Slider;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
-import javafx.scene.control.cell.TextFieldListCell;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
@@ -32,6 +33,8 @@ import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
+import javafx.util.StringConverter;
+
 import org.kordamp.ikonli.javafx.FontIcon;
 
 /**
@@ -82,18 +85,30 @@ public class Controller {
     private ImageView coverImageView;
     
     @FXML
-    private HBox id3DataBox;
+    private HBox metaDataBox;
     
     @FXML
-    private ListView<String> editableListView;
+    private TextField albumArtist;
+
+    @FXML
+    private TextField albumTitle;
+
+    @FXML
+    private DatePicker albumDate;
+
+    @FXML
+    private TextField albumEpisode;
+
+    @FXML
+    private TableView<TrackData> dataTableView;
     
     @FXML
-    private TextField newItemField;
-    
+    private TextField trackArtist, trackTitle, trackNumber, startTime;
+
     @FXML
     private Button addButton;
     
-    private final ObservableList<String> items = FXCollections.observableArrayList();
+    private String datePattern = "yyyy-MM-dd";
 
     public Controller() {
         songSlider = new Slider();
@@ -109,14 +124,16 @@ public class Controller {
         coverImageView.setImage(image);
         setControlsEnabled(false);
         
-        editableListView.setItems(items);
+        /*editableListView.setItems(items);
         editableListView.setCellFactory(TextFieldListCell.forListView());
         editableListView.setEditable(true);
         editableListView.setOnEditCommit(event -> {
             int index = event.getIndex();
             String newValue = event.getNewValue();
             items.set(index, newValue);
-        });
+        });*/
+
+        albumDate.setConverter(getConverter());
     }
 
     @FXML
@@ -216,22 +233,63 @@ public class Controller {
     private void cueButtonAction(ActionEvent actionEvent) {
         //
     }
-    
+
     @FXML
-    private void handleAddItem(ActionEvent actionEvent) {
-        String newItem = newItemField.getText().trim();
-        if (!newItem.isEmpty()) {
-            items.add(newItem);
-            newItemField.clear();
-        }
+    private void handleAddTrack(ActionEvent actionEvent) {
+        String artist = trackArtist.getText();
+        String title = trackTitle.getText();
+        int track = Integer.parseInt(trackNumber.getText());
+        int time = Integer.parseInt(startTime.getText());
+    
+        // Create a new Song object
+        TrackData newTrack = new TrackData(artist, title, track, time);
+        
+        // Add to the TableView
+        dataTableView.getItems().add(newTrack);
+        
+        // Clear the input fields
+        trackArtist.clear();
+        trackTitle.clear();
+        trackNumber.clear();
+        startTime.clear();
     }
 
     public void setControlsEnabled(boolean enabled) {
-        for (var node : id3DataBox.getChildren()) {
+        for (var node : metaDataBox.getChildren()) {
             if (node instanceof Control) {
                 ((Control) node).setDisable(!enabled);
             }
         }
     }
     
+    public StringConverter<LocalDate> getConverter() {
+
+        StringConverter<LocalDate> converter = new StringConverter<LocalDate>() {
+
+            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(datePattern);
+
+            @Override
+            public String toString(LocalDate date) {
+                if (date != null) {
+                    return dateFormatter.format(date);
+                } else {
+                    return "";
+                }
+            }
+    
+            @Override
+            public LocalDate fromString(String string) {
+                if (string != null && !string.isEmpty()) {
+                    return LocalDate.parse(string, dateFormatter);
+                } else {
+                    return null;
+                }
+            }
+
+        };
+
+        return converter;
+
+    }
+
 }
