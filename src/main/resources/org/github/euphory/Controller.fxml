@@ -36,7 +36,7 @@
  *    stylesheets="@style.css"
 -->
 <VBox alignment="TOP_CENTER" spacing="20.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
-        fx:controller="org.github.euphory.Controller">
+        fx:controller="org.github.euphory.Controller" stylesheets="@style.css">
     <children>
         
         <!-- Toolbar with buttons -->

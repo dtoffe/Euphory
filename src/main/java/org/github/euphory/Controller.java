@@ -34,7 +34,6 @@ import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
 import javafx.util.StringConverter;
-
 import org.kordamp.ikonli.javafx.FontIcon;
 
 /**
@@ -94,10 +93,13 @@ public class Controller {
     private TextField albumTitle;
 
     @FXML
-    private DatePicker albumDate;
+    private TextField albumSubtitle;
 
     @FXML
     private TextField albumEpisode;
+
+    @FXML
+    private DatePicker albumDate;
 
     @FXML
     private TableView<TrackData> dataTableView;
@@ -174,7 +176,8 @@ public class Controller {
                 }
             }
         });
-        onContentEdited();
+
+        setupChangeListeners();
     }
     
     @FXML
@@ -262,6 +265,23 @@ public class Controller {
         }
     }
     
+    public void setupChangeListeners() {
+
+        coverImageView.imageProperty().addListener((observable, oldValue, newValue) -> onContentEdited());
+
+        albumArtist.textProperty().addListener((observable, oldValue, newValue) -> onContentEdited());
+        albumTitle.textProperty().addListener((observable, oldValue, newValue) -> onContentEdited());
+        albumSubtitle.textProperty().addListener((observable, oldValue, newValue) -> onContentEdited());
+        albumDate.valueProperty().addListener((observable, oldValue, newValue) -> onContentEdited());
+        albumEpisode.textProperty().addListener((observable, oldValue, newValue) -> onContentEdited());
+
+        trackArtist.textProperty().addListener((observable, oldValue, newValue) -> onContentEdited());
+        trackTitle.textProperty().addListener((observable, oldValue, newValue) -> onContentEdited());
+        trackNumber.textProperty().addListener((observable, oldValue, newValue) -> onContentEdited());
+        startTime.textProperty().addListener((observable, oldValue, newValue) -> onContentEdited());
+
+    }
+
     public StringConverter<LocalDate> getConverter() {
 
         StringConverter<LocalDate> converter = new StringConverter<LocalDate>() {
