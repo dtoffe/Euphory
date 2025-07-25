@@ -10,10 +10,12 @@
 package org.github.euphory;
 
 import java.io.File;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 import javafx.beans.Observable;
+import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
@@ -30,10 +32,15 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.media.Media;
-import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
 import javafx.util.StringConverter;
+
+import org.github.euphory.model.Model;
+import org.github.euphory.model.TrackDataViewModel;
+import org.github.euphory.service.FileService;
+import org.github.euphory.service.PlayerService;
+import org.github.euphory.tags.AudioTagFormat;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 /**
@@ -42,7 +49,7 @@ import org.kordamp.ikonli.javafx.FontIcon;
  */
 public class Controller {
 
-    MediaPlayer mediaPlayer;
+    private final PlayerService playerService;
 
     @FXML
     private Button openButton;
@@ -102,7 +109,7 @@ public class Controller {
     private DatePicker albumDate;
 
     @FXML
-    private TableView<TrackData> dataTableView;
+    private TableView<TrackDataViewModel> dataTableView;
     
     @FXML
     private TextField trackArtist, trackTitle, trackNumber, startTime;
@@ -113,15 +120,16 @@ public class Controller {
     private String datePattern = "yyyy-MM-dd";
 
     public Controller() {
+        this.playerService = new PlayerService();
         songSlider = new Slider();
     }
     
     @FXML
     private void initialize() throws Exception {
         songSlider.setMin(0);
-        playButton.setOnAction(e -> mediaPlayer.play());
-        pauseButton.setOnAction(e -> mediaPlayer.pause());
-        stopButton.setOnAction(e -> mediaPlayer.stop());
+        playButton.setOnAction(e -> playerService.play());
+        pauseButton.setOnAction(e -> playerService.pause());
+        stopButton.setOnAction(e -> playerService.stop());
         Image image = new Image("none.png");
         coverImageView.setImage(image);
         setControlsEnabled(false);
@@ -136,6 +144,15 @@ public class Controller {
         });*/
 
         albumDate.setConverter(getConverter());
+
+        // Bind the ViewModel to the UI controls
+        Bindings.bindBidirectional(albumArtist.textProperty(), Model.getCurrentAlbum().albumArtistProperty());
+        Bindings.bindBidirectional(albumTitle.textProperty(), Model.getCurrentAlbum().albumTitleProperty());
+        Bindings.bindBidirectional(albumSubtitle.textProperty(), Model.getCurrentAlbum().albumSubtitleProperty());
+        Bindings.bindBidirectional(albumDate.valueProperty(), Model.getCurrentAlbum().albumDateProperty());
+        Bindings.bindBidirectional(albumEpisode.textProperty(), Model.getCurrentAlbum().albumEpisodeProperty());
+        // Bindings.bindContentBidirectional(dataTableView.getItems(), viewModel.getAlbumTracks());
+        // Bindings.bindBidirectional(coverImageView.imageProperty(), viewModel.coverImageProperty());
     }
 
     @FXML
@@ -146,36 +163,44 @@ public class Controller {
         }
         Main.appendFileNameToTitle(Model.getFileName());
         
-        mediaPlayer = new MediaPlayer(media);
+        playerService.setMedia(media);
         songSlider.setMin(0);
-        mediaPlayer.setOnReady(() -> {
-            songSlider.setMax(mediaPlayer.getTotalDuration().toSeconds());
-            maxTimeLabel.setText(Util.toFormattedTime(mediaPlayer.getTotalDuration()));
+        playerService.getMediaPlayer().setOnReady(() -> {
+            songSlider.setMax(playerService.getTotalDuration().toSeconds());
+            maxTimeLabel.setText(Util.toFormattedTime(playerService.getTotalDuration()));
         });
 
-        mediaPlayer.currentTimeProperty().addListener((Observable observable) -> {
+        playerService.getMediaPlayer().currentTimeProperty().addListener((Observable observable) -> {
             if (!songSlider.isValueChanging()) { // Check if the user is not currently dragging the slider
-                songSlider.setValue(mediaPlayer.getCurrentTime().toSeconds());
-                runTimeLabel.setText(Util.toFormattedTime(mediaPlayer.getCurrentTime()));
+                songSlider.setValue(playerService.getCurrentTime().toSeconds());
+                runTimeLabel.setText(Util.toFormattedTime(playerService.getCurrentTime()));
             }
         });
         
         songSlider.valueChangingProperty().addListener((observable, wasChanging, isChanging) -> {
             if (!isChanging) {
-                mediaPlayer.seek(Duration.seconds(songSlider.getValue()));
-                runTimeLabel.setText(Util.toFormattedTime(mediaPlayer.getCurrentTime()));
+                playerService.seek(Duration.seconds(songSlider.getValue()));
+                runTimeLabel.setText(Util.toFormattedTime(playerService.getCurrentTime()));
             }
         });
 
         songSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
             if (!songSlider.isValueChanging()) {
-                double currentTime = mediaPlayer.getCurrentTime().toSeconds();
+                double currentTime = playerService.getCurrentTime().toSeconds();
                 if (Math.abs(currentTime - newValue.doubleValue()) > 0.5) {
-                    mediaPlayer.seek(Duration.seconds(newValue.doubleValue()));
-                    runTimeLabel.setText(Util.toFormattedTime(mediaPlayer.getCurrentTime()));
+                    playerService.seek(Duration.seconds(newValue.doubleValue()));
+                    runTimeLabel.setText(Util.toFormattedTime(playerService.getCurrentTime()));
                 }
             }
         });
+
+        try {
+            AudioTagFormat format = FileService.detectTagFormat(Model.getMediaFile());
+            Main.showAlert(Alert.AlertType.INFORMATION, "Info", "Tag format detected: " + format.name(), "");
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 
         setupChangeListeners();
     }
@@ -194,41 +219,46 @@ public class Controller {
     
     @FXML
     private void rewindButtonAction(ActionEvent actionEvent) {
-        mediaPlayer.seek(Duration.seconds(songSlider.getValue() - 5));
-        runTimeLabel.setText(Util.toFormattedTime(mediaPlayer.getCurrentTime()));
+        playerService.seek(Duration.seconds(songSlider.getValue() - 5));
+        runTimeLabel.setText(Util.toFormattedTime(playerService.getCurrentTime()));
     }
 
     @FXML
     private void playButtonAction(ActionEvent actionEvent) {
-        mediaPlayer.play();
+        playerService.play();
     }
 
     @FXML
     private void pauseButtonAction(ActionEvent actionEvent) {
-        mediaPlayer.pause();
+        playerService.pause();
     }
 
     @FXML
     private void stopButtonAction(ActionEvent actionEvent) {
-        mediaPlayer.stop();
+        playerService.stop();
     }
 
     @FXML
     private void forwardButtonAction(ActionEvent actionEvent) {
-        mediaPlayer.seek(Duration.seconds(songSlider.getValue() + 5));
-        runTimeLabel.setText(Util.toFormattedTime(mediaPlayer.getCurrentTime()));
+        playerService.seek(Duration.seconds(songSlider.getValue() + 5));
+        runTimeLabel.setText(Util.toFormattedTime(playerService.getCurrentTime()));
     }
 
     @FXML
     private void saveButtonAction(ActionEvent actionEvent) {
+        saveAll();
         onContentSaved();
     }
     
-    public void onContentEdited() {
+    private void saveAll() {
+        
+    }
+    
+    private void onContentEdited() {
         saveIcon.getStyleClass().add("font-icon-red");
     }
 
-    public void onContentSaved() {
+    private void onContentSaved() {
         saveIcon.getStyleClass().remove("font-icon-red");
     }
 
@@ -245,7 +275,7 @@ public class Controller {
         int time = Integer.parseInt(startTime.getText());
     
         // Create a new Song object
-        TrackData newTrack = new TrackData(artist, title, track, time);
+        TrackDataViewModel newTrack = new TrackDataViewModel(artist, title, track, time);
         
         // Add to the TableView
         dataTableView.getItems().add(newTrack);
@@ -257,7 +287,7 @@ public class Controller {
         startTime.clear();
     }
 
-    public void setControlsEnabled(boolean enabled) {
+    private void setControlsEnabled(boolean enabled) {
         for (var node : metaDataBox.getChildren()) {
             if (node instanceof Control) {
                 ((Control) node).setDisable(!enabled);
@@ -265,7 +295,7 @@ public class Controller {
         }
     }
     
-    public void setupChangeListeners() {
+    private void setupChangeListeners() {
 
         coverImageView.imageProperty().addListener((observable, oldValue, newValue) -> onContentEdited());
 
@@ -282,7 +312,7 @@ public class Controller {
 
     }
 
-    public StringConverter<LocalDate> getConverter() {
+    private StringConverter<LocalDate> getConverter() {
 
         StringConverter<LocalDate> converter = new StringConverter<LocalDate>() {
 

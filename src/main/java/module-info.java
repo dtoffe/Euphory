@@ -21,4 +21,5 @@ module org.github.euphory {
 
     opens org.github.euphory to javafx.fxml;
     exports org.github.euphory;
+    exports org.github.euphory.tags;
 }

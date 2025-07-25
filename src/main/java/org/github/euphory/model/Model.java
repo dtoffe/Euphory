@@ -7,9 +7,10 @@
  *
  * Alternatively, see the LICENSE file included with this source code for the full license text.
  */
-package org.github.euphory;
+package org.github.euphory.model;
 
 import java.io.File;
+
 import javafx.scene.media.Media;
 
 /**
@@ -18,11 +19,11 @@ import javafx.scene.media.Media;
  */
 public class Model {
     
-    static File currentFile;
+    private static File currentFile;
 
-    private static AlbumData currentAlbum;
+    private static AlbumDataViewModel currentAlbum;
     
-    public Model() {
+    private Model() {
         
     }
     
@@ -45,11 +46,14 @@ public class Model {
         return null;
     }
     
-    public static void setCurrentAlbum(AlbumData album) {
+    public static void setCurrentAlbum(AlbumDataViewModel album) {
         currentAlbum = album;
     }
     
-    public static AlbumData getCurrentAlbum() {
+    public static AlbumDataViewModel getCurrentAlbum() {
+        if (currentAlbum == null) {
+            currentAlbum = new AlbumDataViewModel();
+        }
         return currentAlbum;
     }
 

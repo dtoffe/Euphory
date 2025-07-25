@@ -7,10 +7,15 @@
  *
  * Alternatively, see the LICENSE file included with this source code for the full license text.
  */
-package org.github.euphory;
+package org.github.euphory.service;
 
 import java.io.File;
 import java.io.IOException;
+import org.github.euphory.Main;
+import org.github.euphory.model.Model;
+import org.github.euphory.tags.AudioTagFormat;
+import org.github.euphory.tags.AudioTagDetector;
+
 import javafx.scene.control.Alert;
 import javafx.scene.media.Media;
 import javafx.stage.FileChooser;
@@ -36,7 +41,7 @@ public class FileService {
         return Model.getMedia();
     }
 
-    public void saveMediaFile(File file, String content) throws IOException {
+    public static void saveMediaFile(File file, String content) throws IOException {
 //        FileChooser fileChooser = new FileChooser();
 //        File file = fileChooser.showSaveDialog(null);
 //        if (file != null) {
@@ -49,4 +54,8 @@ public class FileService {
 //        }
     }
 
+    public static AudioTagFormat detectTagFormat(File audioFile) throws IOException {
+        return AudioTagDetector.detectTagFormat(audioFile);
+    }   
+    
 }
