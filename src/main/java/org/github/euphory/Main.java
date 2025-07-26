@@ -51,7 +51,12 @@ public class Main extends Application {
     
     private static Parent loadFXML(String fxml) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource(fxml + ".fxml"));
-        return fxmlLoader.load();
+        try {
+            return fxmlLoader.load();
+        } catch (IOException e) {
+            showAlert(AlertType.ERROR, "Error Loading FXML", "An error occurred while loading the FXML file.", e.getMessage());
+            return null; // Or handle the error in a way that makes sense for your application
+        }
     }
     
     private void setStage(Stage stage) {
@@ -73,13 +78,6 @@ public class Main extends Application {
         alert.setContentText(content);
         alert.initOwner(stage.getScene().getWindow());
         alert.showAndWait();
-    }
-    
-    public static void appendFileNameToTitle(String fileName) {
-        if (fileName != null && !fileName.isBlank()) {
-            String baseTitle = stage.getTitle().split("\\.")[0];
-            stage.setTitle(baseTitle + ".   -   " + fileName);
-        }
     }
     
 }

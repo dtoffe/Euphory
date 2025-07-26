@@ -10,7 +10,6 @@
 package org.github.euphory;
 
 import java.io.File;
-import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
@@ -21,6 +20,7 @@ import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Control;
 import javafx.scene.control.DatePicker;
@@ -40,7 +40,6 @@ import org.github.euphory.model.Model;
 import org.github.euphory.model.TrackDataViewModel;
 import org.github.euphory.service.FileService;
 import org.github.euphory.service.PlayerService;
-import org.github.euphory.tags.AudioTagFormat;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 /**
@@ -124,6 +123,21 @@ public class Controller {
         songSlider = new Slider();
     }
     
+    /**
+     * Sets up the listeners for the song slider to handle user interaction and updates to the player's current time.
+     */
+    private void setupSliderListeners() {
+        songSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
+            if (!songSlider.isValueChanging()) {
+                double currentTime = playerService.getCurrentTime().toSeconds();
+                if (Math.abs(currentTime - newValue.doubleValue()) > 0.5) {
+                    playerService.seek(Duration.seconds(newValue.doubleValue()));
+                    runTimeLabel.setText(Util.toFormattedTime(playerService.getCurrentTime()));
+                }
+            }
+        });
+    }
+
     @FXML
     private void initialize() throws Exception {
         songSlider.setMin(0);
@@ -153,6 +167,8 @@ public class Controller {
         Bindings.bindBidirectional(albumEpisode.textProperty(), Model.getCurrentAlbum().albumEpisodeProperty());
         // Bindings.bindContentBidirectional(dataTableView.getItems(), viewModel.getAlbumTracks());
         // Bindings.bindBidirectional(coverImageView.imageProperty(), viewModel.coverImageProperty());
+
+        setupSliderListeners();
     }
 
     @FXML
@@ -161,7 +177,7 @@ public class Controller {
         if (media == null) {
             return;
         }
-        Main.appendFileNameToTitle(Model.getFileName());
+        appendFileNameToTitle(Model.getFileName());
         
         playerService.setMedia(media);
         songSlider.setMin(0);
@@ -176,30 +192,12 @@ public class Controller {
                 runTimeLabel.setText(Util.toFormattedTime(playerService.getCurrentTime()));
             }
         });
-        
-        songSlider.valueChangingProperty().addListener((observable, wasChanging, isChanging) -> {
-            if (!isChanging) {
-                playerService.seek(Duration.seconds(songSlider.getValue()));
-                runTimeLabel.setText(Util.toFormattedTime(playerService.getCurrentTime()));
-            }
-        });
 
-        songSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
-            if (!songSlider.isValueChanging()) {
-                double currentTime = playerService.getCurrentTime().toSeconds();
-                if (Math.abs(currentTime - newValue.doubleValue()) > 0.5) {
-                    playerService.seek(Duration.seconds(newValue.doubleValue()));
-                    runTimeLabel.setText(Util.toFormattedTime(playerService.getCurrentTime()));
-                }
-            }
-        });
-
-        try {
-            AudioTagFormat format = FileService.detectTagFormat(Model.getMediaFile());
-            Main.showAlert(Alert.AlertType.INFORMATION, "Info", "Tag format detected: " + format.name(), "");
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+        // TODO: Implement M4A metadata extraction and display in UI
+        File file = Model.getMediaFile();
+        if (file != null && file.getName().toLowerCase().endsWith(".m4a")) {
+            Model.getCurrentAlbum().albumArtistProperty().set("Artist Placeholder");
+            Model.getCurrentAlbum().albumTitleProperty().set("Title Placeholder");
         }
 
         setupChangeListeners();
@@ -303,7 +301,10 @@ public class Controller {
         albumTitle.textProperty().addListener((observable, oldValue, newValue) -> onContentEdited());
         albumSubtitle.textProperty().addListener((observable, oldValue, newValue) -> onContentEdited());
         albumDate.valueProperty().addListener((observable, oldValue, newValue) -> onContentEdited());
-        albumEpisode.textProperty().addListener((observable, oldValue, newValue) -> onContentEdited());
+        albumEpisode.textProperty().addListener((observable, oldValue, newValue) -> {
+            onContentEdited();
+            Model.getCurrentAlbum().validateEpisode(new Alert(AlertType.NONE));
+        });
 
         trackArtist.textProperty().addListener((observable, oldValue, newValue) -> onContentEdited());
         trackTitle.textProperty().addListener((observable, oldValue, newValue) -> onContentEdited());
@@ -342,4 +343,11 @@ public class Controller {
 
     }
 
+    public static void appendFileNameToTitle(String fileName) {
+        if (fileName != null && !fileName.isBlank()) {
+            String baseTitle = Main.getStage().getTitle().split("\\.")[0];
+            Main.getStage().setTitle(baseTitle + ".   -   " + fileName);
+        }
+    }
+    
 }
