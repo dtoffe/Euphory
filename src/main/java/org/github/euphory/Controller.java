@@ -10,8 +10,10 @@
 package org.github.euphory;
 
 import java.io.File;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
@@ -20,7 +22,6 @@ import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Control;
 import javafx.scene.control.DatePicker;
@@ -39,7 +40,9 @@ import javafx.util.StringConverter;
 import org.github.euphory.model.Model;
 import org.github.euphory.model.TrackDataViewModel;
 import org.github.euphory.service.FileService;
+import org.github.euphory.service.TagService;
 import org.github.euphory.service.PlayerService;
+
 import org.kordamp.ikonli.javafx.FontIcon;
 
 /**
@@ -48,7 +51,8 @@ import org.kordamp.ikonli.javafx.FontIcon;
  */
 public class Controller {
 
-    private final PlayerService playerService;
+private final PlayerService playerService;
+private final TagService tagService;
 
     @FXML
     private Button openButton;
@@ -118,10 +122,11 @@ public class Controller {
     
     private String datePattern = "yyyy-MM-dd";
 
-    public Controller() {
-        this.playerService = new PlayerService();
-        songSlider = new Slider();
-    }
+public Controller() {
+    this.playerService = new PlayerService();
+    this.tagService = new TagService();
+    songSlider = new Slider();
+}
     
     /**
      * Sets up the listeners for the song slider to handle user interaction and updates to the player's current time.
@@ -169,6 +174,9 @@ public class Controller {
         // Bindings.bindBidirectional(coverImageView.imageProperty(), viewModel.coverImageProperty());
 
         setupSliderListeners();
+        
+        // Additional initialization code
+        System.out.println("Controller initialized successfully.");
     }
 
     @FXML
@@ -193,11 +201,15 @@ public class Controller {
             }
         });
 
-        // TODO: Implement M4A metadata extraction and display in UI
+        // Read tags from audio file using TagService
         File file = Model.getMediaFile();
-        if (file != null && file.getName().toLowerCase().endsWith(".m4a")) {
-            Model.getCurrentAlbum().albumArtistProperty().set("Artist Placeholder");
-            Model.getCurrentAlbum().albumTitleProperty().set("Title Placeholder");
+        if (file != null) {
+            try {
+                tagService.loadTagsFromFile(file.getAbsolutePath(), Model.getCurrentAlbum());
+            } catch (Exception e) {
+                e.printStackTrace();
+                Main.showAlert(Alert.AlertType.ERROR, "Error", "Error reading metadata: " + e.getMessage(), "");
+            }
         }
 
         setupChangeListeners();
@@ -247,11 +259,35 @@ public class Controller {
         saveAll();
         onContentSaved();
     }
-    
+
     private void saveAll() {
-        
+        // Save album metadata
+        File file = Model.getMediaFile();
+        if (file != null) {
+            System.out.println("Saving M4A metadata to " + file.getName() + "...");
+            try {
+                tagService.writeTagsToFile(file.getAbsolutePath(), Model.getCurrentAlbum());
+                System.out.println("M4A metadata saved successfully.");
+            } catch (Exception e) {
+                e.printStackTrace();
+                Main.showAlert(Alert.AlertType.ERROR, "Error", "Error saving metadata: " + e.getMessage(), "");
+            }
+        }
+
+        // Save track data
+        List<TrackDataViewModel> tracks = dataTableView.getItems();
+        if (!tracks.isEmpty()) {
+            System.out.println("Saving track data...");
+            try {
+                FileService.saveTrackData(Model.getMediaFile(), tracks);
+                System.out.println("Track data saved successfully.");
+            } catch (IOException e) {
+                e.printStackTrace();
+                Main.showAlert(Alert.AlertType.ERROR, "Error", "Error saving track data: " + e.getMessage(), "");
+            }
+        }
     }
-    
+
     private void onContentEdited() {
         saveIcon.getStyleClass().add("font-icon-red");
     }
@@ -301,10 +337,7 @@ public class Controller {
         albumTitle.textProperty().addListener((observable, oldValue, newValue) -> onContentEdited());
         albumSubtitle.textProperty().addListener((observable, oldValue, newValue) -> onContentEdited());
         albumDate.valueProperty().addListener((observable, oldValue, newValue) -> onContentEdited());
-        albumEpisode.textProperty().addListener((observable, oldValue, newValue) -> {
-            onContentEdited();
-            Model.getCurrentAlbum().validateEpisode(new Alert(AlertType.NONE));
-        });
+        albumEpisode.textProperty().addListener((observable, oldValue, newValue) -> onContentEdited());
 
         trackArtist.textProperty().addListener((observable, oldValue, newValue) -> onContentEdited());
         trackTitle.textProperty().addListener((observable, oldValue, newValue) -> onContentEdited());

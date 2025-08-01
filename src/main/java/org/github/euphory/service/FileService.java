@@ -11,21 +11,22 @@ package org.github.euphory.service;
 
 import java.io.File;
 import java.io.IOException;
-import org.github.euphory.Main;
-import org.github.euphory.model.Model;
-import org.github.euphory.tags.AudioTagFormat;
-import org.github.euphory.tags.AudioTagDetector;
+import java.util.List;
 
 import javafx.scene.control.Alert;
 import javafx.scene.media.Media;
 import javafx.stage.FileChooser;
 
+import org.github.euphory.Main;
+import org.github.euphory.model.Model;
+import org.github.euphory.model.TrackDataViewModel;
+
 /**
  * @author Daniel Toffetti
- * 
+ *
  */
 public class FileService {
-    
+
     public static Media openMediaFile() {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Open Mp3/M4a File");
@@ -54,8 +55,11 @@ public class FileService {
 //        }
     }
 
-    public static AudioTagFormat detectTagFormat(File audioFile) throws IOException {
-        return AudioTagDetector.detectTagFormat(audioFile);
-    }   
-    
+    public static void saveTrackData(File file, List<TrackDataViewModel> tracks) throws IOException {
+        // Implement the logic to save track data to the file
+        // This is a placeholder implementation
+        System.out.println("Saving track data to " + file.getName() + "...");
+        // Add your implementation here
+    }
+
 }
