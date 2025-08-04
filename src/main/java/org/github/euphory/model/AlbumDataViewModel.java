@@ -17,6 +17,8 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.Image;
 
 /**
@@ -65,7 +67,7 @@ public class AlbumDataViewModel {
      * Constructs a new AlbumDataViewModel.
      */
     public AlbumDataViewModel() {
-        
+        albumEpisode.addListener((observable, oldValue, newValue) -> validateEpisode(null));
     }
 
     /**
@@ -101,6 +103,7 @@ public class AlbumDataViewModel {
      * @return The album episode property.
      */
     public StringProperty albumEpisodeProperty() {
+        albumEpisode.set(formatEpisode());
         return albumEpisode;
     }
 
@@ -153,4 +156,45 @@ public class AlbumDataViewModel {
         this.albumTracks.add(track);
     }
 
+    /**
+     * Validates the album episode number.
+     *
+     * @param alert The alert to show if the episode number is invalid.
+     */
+    public void validateEpisode(Alert alert) {
+        try {
+            if (albumEpisode.get() == null || albumEpisode.get() == "") {
+                return;
+            }
+            int value = Integer.parseInt(albumEpisode.get());
+            if (value < 0 || value > 2000) {
+                if (alert != null) {
+                    alert.setAlertType(AlertType.ERROR);
+                    alert.setTitle("Error");
+                    alert.setHeaderText("Invalid episode number: Integer out of range.");
+                    alert.showAndWait();
+                }
+            }
+        } catch (NumberFormatException e) {
+            if (alert != null) {
+                alert.setAlertType(AlertType.ERROR);
+                alert.setTitle("Error");
+                alert.setHeaderText("Invalid number or numeric format");
+                alert.showAndWait();
+            }
+        }
+    }
+
+    /**
+     * Formats the album episode number.
+     *
+     * @return The formatted episode number.
+     */
+    public String formatEpisode() {
+        if (albumEpisode.get() == null) {
+            return "";
+        }
+        int value = Integer.parseInt(albumEpisode.get());
+        return String.format("%03d", value);
+    }
 }
