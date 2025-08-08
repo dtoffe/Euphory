@@ -9,8 +9,6 @@
  */
 package org.github.euphory.model;
 
-import java.time.LocalDate;
-
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -51,7 +49,7 @@ public class AlbumDataViewModel {
     /**
      * The album date property.
      */
-    private ObjectProperty<LocalDate> albumDate = new SimpleObjectProperty<>();
+    private StringProperty albumDate = new SimpleStringProperty();
 
     /**
      * The album tracks.
@@ -112,7 +110,7 @@ public class AlbumDataViewModel {
      *
      * @return The album date property.
      */
-    public ObjectProperty<LocalDate> albumDateProperty() {
+    public StringProperty albumDateProperty() {
         return albumDate;
     }
 

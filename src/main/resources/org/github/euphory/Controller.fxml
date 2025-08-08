@@ -130,11 +130,7 @@
                     <Label text="Episode #:"/>
                     <TextField fx:id="albumEpisode" prefWidth="50" promptText="Ep. #" />
                     <Label text="Date:"/>
-                    <DatePicker fx:id="albumDate" promptText="Enter date (yyyy-mm-dd)">
-                        <converter>
-                            <javafx.util.converter.LocalDateStringConverter />
-                        </converter>
-                    </DatePicker>
+                    <TextField fx:id="albumDate" prefWidth="100" promptText="Enter date (yyyy-mm-dd)" />
                 </HBox>
                 
                 <Separator orientation="HORIZONTAL" />

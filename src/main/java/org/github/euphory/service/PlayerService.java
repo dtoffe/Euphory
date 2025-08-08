@@ -53,6 +53,7 @@ public class PlayerService {
 
     public void seek(Duration duration) {
         if (mediaPlayer != null) {
+            System.out.println("Seeking to: " + duration);
             mediaPlayer.seek(duration);
         }
     }

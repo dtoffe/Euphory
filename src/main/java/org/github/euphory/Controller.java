@@ -10,8 +10,6 @@
 package org.github.euphory;
 
 import java.io.File;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
@@ -23,7 +21,6 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Control;
-import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TableView;
@@ -34,7 +31,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.media.Media;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
-import javafx.util.StringConverter;
 
 import org.github.euphory.model.Model;
 import org.github.euphory.model.TrackDataViewModel;
@@ -105,7 +101,7 @@ public class Controller {
     private TextField albumEpisode;
 
     @FXML
-    private DatePicker albumDate;
+    private TextField albumDate;
 
     @FXML
     private TableView<TrackDataViewModel> dataTableView;
@@ -115,8 +111,6 @@ public class Controller {
 
     @FXML
     private Button addButton;
-    
-    private String datePattern = "yyyy-MM-dd";
 
     public Controller() {
         this.playerService = new PlayerService();
@@ -127,9 +121,17 @@ public class Controller {
      * Sets up the listeners for the song slider to handle user interaction and updates to the player's current time.
      */
     private void setupSliderListeners() {
+        songSlider.valueChangingProperty().addListener((observable, wasChanging, isChanging) -> {
+            if (!isChanging) {
+                System.out.println("Is changing : Current time: " + Duration.seconds(songSlider.getValue()));
+                playerService.seek(Duration.seconds(songSlider.getValue()));
+                runTimeLabel.setText(Util.toFormattedTime(playerService.getCurrentTime()));
+            }
+        });
         songSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
             if (!songSlider.isValueChanging()) {
                 double currentTime = playerService.getCurrentTime().toSeconds();
+                System.out.println("Value changing : Current time: " + currentTime + ", New value: " + newValue.doubleValue());
                 if (Math.abs(currentTime - newValue.doubleValue()) > 0.5) {
                     playerService.seek(Duration.seconds(newValue.doubleValue()));
                     runTimeLabel.setText(Util.toFormattedTime(playerService.getCurrentTime()));
@@ -157,18 +159,15 @@ public class Controller {
             items.set(index, newValue);
         });*/
 
-        albumDate.setConverter(getConverter());
-
         // Bind the ViewModel to the UI controls
         Bindings.bindBidirectional(albumArtist.textProperty(), Model.getCurrentAlbum().albumArtistProperty());
         Bindings.bindBidirectional(albumTitle.textProperty(), Model.getCurrentAlbum().albumTitleProperty());
         Bindings.bindBidirectional(albumSubtitle.textProperty(), Model.getCurrentAlbum().albumSubtitleProperty());
-        Bindings.bindBidirectional(albumDate.valueProperty(), Model.getCurrentAlbum().albumDateProperty());
+        Bindings.bindBidirectional(albumDate.textProperty(), Model.getCurrentAlbum().albumDateProperty());
         Bindings.bindBidirectional(albumEpisode.textProperty(), Model.getCurrentAlbum().albumEpisodeProperty());
         // Bindings.bindContentBidirectional(dataTableView.getItems(), viewModel.getAlbumTracks());
         // Bindings.bindBidirectional(coverImageView.imageProperty(), viewModel.coverImageProperty());
 
-        setupSliderListeners();
     }
 
     @FXML
@@ -188,6 +187,7 @@ public class Controller {
 
         playerService.getMediaPlayer().currentTimeProperty().addListener((Observable observable) -> {
             if (!songSlider.isValueChanging()) { // Check if the user is not currently dragging the slider
+                System.out.println("Is changing : Current time: " + Duration.seconds(songSlider.getValue()));
                 songSlider.setValue(playerService.getCurrentTime().toSeconds());
                 runTimeLabel.setText(Util.toFormattedTime(playerService.getCurrentTime()));
             }
@@ -200,6 +200,8 @@ public class Controller {
             Model.getCurrentAlbum().albumTitleProperty().set("Title Placeholder");
         }
 
+        setupSliderListeners();
+        
         setupChangeListeners();
     }
     
@@ -300,7 +302,7 @@ public class Controller {
         albumArtist.textProperty().addListener((observable, oldValue, newValue) -> onContentEdited());
         albumTitle.textProperty().addListener((observable, oldValue, newValue) -> onContentEdited());
         albumSubtitle.textProperty().addListener((observable, oldValue, newValue) -> onContentEdited());
-        albumDate.valueProperty().addListener((observable, oldValue, newValue) -> onContentEdited());
+        albumDate.textProperty().addListener((observable, oldValue, newValue) -> onContentEdited());
         albumEpisode.textProperty().addListener((observable, oldValue, newValue) -> {
             onContentEdited();
             Model.getCurrentAlbum().validateEpisode(new Alert(AlertType.NONE));
@@ -310,36 +312,6 @@ public class Controller {
         trackTitle.textProperty().addListener((observable, oldValue, newValue) -> onContentEdited());
         trackNumber.textProperty().addListener((observable, oldValue, newValue) -> onContentEdited());
         startTime.textProperty().addListener((observable, oldValue, newValue) -> onContentEdited());
-
-    }
-
-    private StringConverter<LocalDate> getConverter() {
-
-        StringConverter<LocalDate> converter = new StringConverter<LocalDate>() {
-
-            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(datePattern);
-
-            @Override
-            public String toString(LocalDate date) {
-                if (date != null) {
-                    return dateFormatter.format(date);
-                } else {
-                    return "";
-                }
-            }
-    
-            @Override
-            public LocalDate fromString(String string) {
-                if (string != null && !string.isEmpty()) {
-                    return LocalDate.parse(string, dateFormatter);
-                } else {
-                    return null;
-                }
-            }
-
-        };
-
-        return converter;
 
     }
 
