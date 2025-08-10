@@ -113,17 +113,16 @@ public class Controller {
     private Button addButton;
 
     public Controller() {
-        this.playerService = new PlayerService();
+        playerService = new PlayerService();
         songSlider = new Slider();
     }
     
     /**
      * Sets up the listeners for the song slider to handle user interaction and updates to the player's current time.
      */
-    private void setupSliderListeners() {
+    private void setupPlayerListeners() {
         songSlider.valueChangingProperty().addListener((observable, wasChanging, isChanging) -> {
             if (!isChanging) {
-                System.out.println("Is changing : Current time: " + Duration.seconds(songSlider.getValue()));
                 playerService.seek(Duration.seconds(songSlider.getValue()));
                 runTimeLabel.setText(Util.toFormattedTime(playerService.getCurrentTime()));
             }
@@ -131,11 +130,21 @@ public class Controller {
         songSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
             if (!songSlider.isValueChanging()) {
                 double currentTime = playerService.getCurrentTime().toSeconds();
-                System.out.println("Value changing : Current time: " + currentTime + ", New value: " + newValue.doubleValue());
                 if (Math.abs(currentTime - newValue.doubleValue()) > 0.5) {
                     playerService.seek(Duration.seconds(newValue.doubleValue()));
                     runTimeLabel.setText(Util.toFormattedTime(playerService.getCurrentTime()));
                 }
+            }
+        });
+        playerService.getMediaPlayer().setOnReady(() -> {
+            songSlider.setMin(0);
+            songSlider.setMax(playerService.getTotalDuration().toSeconds());
+            maxTimeLabel.setText(Util.toFormattedTime(playerService.getTotalDuration()));
+        });
+        playerService.getMediaPlayer().currentTimeProperty().addListener((Observable observable) -> {
+            if (!songSlider.isValueChanging()) { // Check if the user is not currently dragging the slider
+                songSlider.setValue(playerService.getCurrentTime().toSeconds());
+                runTimeLabel.setText(Util.toFormattedTime(playerService.getCurrentTime()));
             }
         });
     }
@@ -143,9 +152,6 @@ public class Controller {
     @FXML
     private void initialize() throws Exception {
         songSlider.setMin(0);
-        playButton.setOnAction(e -> playerService.play());
-        pauseButton.setOnAction(e -> playerService.pause());
-        stopButton.setOnAction(e -> playerService.stop());
         Image image = new Image("none.png");
         coverImageView.setImage(image);
         setControlsEnabled(false);
@@ -159,15 +165,6 @@ public class Controller {
             items.set(index, newValue);
         });*/
 
-        // Bind the ViewModel to the UI controls
-        Bindings.bindBidirectional(albumArtist.textProperty(), Model.getCurrentAlbum().albumArtistProperty());
-        Bindings.bindBidirectional(albumTitle.textProperty(), Model.getCurrentAlbum().albumTitleProperty());
-        Bindings.bindBidirectional(albumSubtitle.textProperty(), Model.getCurrentAlbum().albumSubtitleProperty());
-        Bindings.bindBidirectional(albumDate.textProperty(), Model.getCurrentAlbum().albumDateProperty());
-        Bindings.bindBidirectional(albumEpisode.textProperty(), Model.getCurrentAlbum().albumEpisodeProperty());
-        // Bindings.bindContentBidirectional(dataTableView.getItems(), viewModel.getAlbumTracks());
-        // Bindings.bindBidirectional(coverImageView.imageProperty(), viewModel.coverImageProperty());
-
     }
 
     @FXML
@@ -175,34 +172,13 @@ public class Controller {
         Media media = FileService.openMediaFile();
         if (media == null) {
             return;
+        } else {
+            playerService.setMedia(media);
+            appendFileNameToTitle(Model.getFileName());
+            setupPlayerListeners();
+            setupModelUIBindings();
+            setupChangeListeners();
         }
-        appendFileNameToTitle(Model.getFileName());
-        
-        playerService.setMedia(media);
-        songSlider.setMin(0);
-        playerService.getMediaPlayer().setOnReady(() -> {
-            songSlider.setMax(playerService.getTotalDuration().toSeconds());
-            maxTimeLabel.setText(Util.toFormattedTime(playerService.getTotalDuration()));
-        });
-
-        playerService.getMediaPlayer().currentTimeProperty().addListener((Observable observable) -> {
-            if (!songSlider.isValueChanging()) { // Check if the user is not currently dragging the slider
-                System.out.println("Is changing : Current time: " + Duration.seconds(songSlider.getValue()));
-                songSlider.setValue(playerService.getCurrentTime().toSeconds());
-                runTimeLabel.setText(Util.toFormattedTime(playerService.getCurrentTime()));
-            }
-        });
-
-        // TODO: Implement M4A metadata extraction and display in UI
-        File file = Model.getMediaFile();
-        if (file != null && file.getName().toLowerCase().endsWith(".m4a")) {
-            Model.getCurrentAlbum().albumArtistProperty().set("Artist Placeholder");
-            Model.getCurrentAlbum().albumTitleProperty().set("Title Placeholder");
-        }
-
-        setupSliderListeners();
-        
-        setupChangeListeners();
     }
     
     @FXML
@@ -295,6 +271,17 @@ public class Controller {
         }
     }
     
+    private void setupModelUIBindings() {
+        // Bind the ViewModel to the UI controls
+        Bindings.bindBidirectional(albumArtist.textProperty(), Model.getCurrentAlbum().albumArtistProperty());
+        Bindings.bindBidirectional(albumTitle.textProperty(), Model.getCurrentAlbum().albumTitleProperty());
+        Bindings.bindBidirectional(albumSubtitle.textProperty(), Model.getCurrentAlbum().albumSubtitleProperty());
+        Bindings.bindBidirectional(albumDate.textProperty(), Model.getCurrentAlbum().albumDateProperty());
+        Bindings.bindBidirectional(albumEpisode.textProperty(), Model.getCurrentAlbum().albumEpisodeProperty());
+        // Bindings.bindContentBidirectional(dataTableView.getItems(), viewModel.getAlbumTracks());
+        // Bindings.bindBidirectional(coverImageView.imageProperty(), viewModel.coverImageProperty());
+    }
+
     private void setupChangeListeners() {
 
         coverImageView.imageProperty().addListener((observable, oldValue, newValue) -> onContentEdited());
