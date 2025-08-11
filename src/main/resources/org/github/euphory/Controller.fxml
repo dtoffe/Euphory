@@ -123,10 +123,6 @@
                     <TextField fx:id="albumTitle" prefWidth="300" promptText="Enter album title" />
                 </HBox>
                 <HBox spacing="10">
-                    <Label text="Album Subtitle:"/>
-                    <TextField fx:id="albumSubtitle" prefWidth="300" promptText="Enter album subtitle" />
-                </HBox>
-                <HBox spacing="10">
                     <Label text="Episode #:"/>
                     <TextField fx:id="albumEpisode" prefWidth="50" promptText="Ep. #" />
                     <Label text="Date:"/>

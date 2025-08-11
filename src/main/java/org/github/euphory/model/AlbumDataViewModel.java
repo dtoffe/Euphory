@@ -9,14 +9,15 @@
  */
 package org.github.euphory.model;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.Image;
 
 /**
@@ -35,11 +36,6 @@ public class AlbumDataViewModel {
      * The album title property.
      */
     private StringProperty albumTitle = new SimpleStringProperty();
-
-    /**
-     * The album subtitle property.
-     */
-    private StringProperty albumSubtitle = new SimpleStringProperty();
 
     /**
      * The album episode property.
@@ -61,11 +57,13 @@ public class AlbumDataViewModel {
      */
     private ObjectProperty<Image> coverImage = new SimpleObjectProperty<>();
     
+    private Map<String, String> additionalTags;
+
     /**
      * Constructs a new AlbumDataViewModel.
      */
     public AlbumDataViewModel() {
-        albumEpisode.addListener((observable, oldValue, newValue) -> validateEpisode(null));
+        this.additionalTags = new HashMap<>();
     }
 
     /**
@@ -87,21 +85,11 @@ public class AlbumDataViewModel {
     }
 
     /**
-     * Gets the album subtitle property.
-     *
-     * @return The album subtitle property.
-     */
-    public StringProperty albumSubtitleProperty() {
-        return albumSubtitle;
-    }
-
-    /**
      * Gets the album episode property.
      *
      * @return The album episode property.
      */
     public StringProperty albumEpisodeProperty() {
-        albumEpisode.set(formatEpisode());
         return albumEpisode;
     }
 
@@ -132,6 +120,14 @@ public class AlbumDataViewModel {
         return coverImage;
     }
 
+    public Map<String, String> getAdditionalTags() {
+        return additionalTags;
+    }
+
+    public void setAdditionalTags(Map<String, String> additionalTags) {
+        this.additionalTags = additionalTags;
+    }
+
     /**
      * Adds a track to the album.
      *
@@ -154,45 +150,18 @@ public class AlbumDataViewModel {
         this.albumTracks.add(track);
     }
 
-    /**
-     * Validates the album episode number.
-     *
-     * @param alert The alert to show if the episode number is invalid.
-     */
-    public void validateEpisode(Alert alert) {
-        try {
-            if (albumEpisode.get() == null || albumEpisode.get() == "") {
-                return;
-            }
-            int value = Integer.parseInt(albumEpisode.get());
-            if (value < 0 || value > 2000) {
-                if (alert != null) {
-                    alert.setAlertType(AlertType.ERROR);
-                    alert.setTitle("Error");
-                    alert.setHeaderText("Invalid episode number: Integer out of range.");
-                    alert.showAndWait();
-                }
-            }
-        } catch (NumberFormatException e) {
-            if (alert != null) {
-                alert.setAlertType(AlertType.ERROR);
-                alert.setTitle("Error");
-                alert.setHeaderText("Invalid number or numeric format");
-                alert.showAndWait();
-            }
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Artist: ").append(albumArtist).append("\n");
+        sb.append("Title: ").append(albumTitle).append("\n");
+        sb.append("Episode: ").append(albumEpisode).append("\n");
+        sb.append("Date: ").append(albumDate).append("\n");
+        sb.append("Additional Tags:\n");
+        for (Map.Entry<String, String> entry : additionalTags.entrySet()) {
+            sb.append("  ").append(entry.getKey()).append(": ").append(entry.getValue()).append("\n");
         }
+        return sb.toString();
     }
 
-    /**
-     * Formats the album episode number.
-     *
-     * @return The formatted episode number.
-     */
-    public String formatEpisode() {
-        if (albumEpisode.get() == null) {
-            return "";
-        }
-        int value = Integer.parseInt(albumEpisode.get());
-        return String.format("%03d", value);
-    }
 }

@@ -9,6 +9,9 @@
  */
 package org.github.euphory.model;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -41,6 +44,12 @@ public class TrackDataViewModel {
      */
     private IntegerProperty startTime = new SimpleIntegerProperty();
 
+    private Map<String, String> additionalTags;
+
+    public TrackDataViewModel() {
+        this.additionalTags = new HashMap<>();
+    }
+
     /**
      * Constructs a new TrackDataViewModel.
      *
@@ -50,6 +59,7 @@ public class TrackDataViewModel {
      * @param startTime   The start time of the track in seconds.
      */
     public TrackDataViewModel(String artist, String title, int trackNumber, int startTime) {
+        this();
         this.trackArtist.set(artist);
         this.trackTitle.set(title);
         this.trackNumber.set(trackNumber);
@@ -92,6 +102,14 @@ public class TrackDataViewModel {
         return startTime;
     }
 
+    public Map<String, String> getAdditionalTags() {
+        return additionalTags;
+    }
+
+    public void setAdditionalTags(Map<String, String> additionalTags) {
+        this.additionalTags = additionalTags;
+    }
+
     /**
      * Displays the start time in HH:MM:SS format.
      *
@@ -102,6 +120,24 @@ public class TrackDataViewModel {
         int minutes = (startTime.get() % 3600) / 60;
         int seconds = (startTime.get() % 3600) % 60;
         return String.format("%02d:%02d:%02d", hours, minutes, seconds);
+    }
+
+    public void addTag(String key, String value) {
+        this.additionalTags.put(key, value);
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Title: ").append(trackTitle).append("\n");
+        sb.append("Artist: ").append(trackArtist).append("\n");
+        sb.append("Track: ").append(trackNumber).append("\n");
+        sb.append("Time: ").append(startTime).append("\n");
+        sb.append("Additional Tags:\n");
+        for (Map.Entry<String, String> entry : additionalTags.entrySet()) {
+            sb.append("  ").append(entry.getKey()).append(": ").append(entry.getValue()).append("\n");
+        }
+        return sb.toString();
     }
 
 }

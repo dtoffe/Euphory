@@ -18,7 +18,6 @@ import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
@@ -155,16 +154,6 @@ public class Controller {
         Image image = new Image("none.png");
         coverImageView.setImage(image);
         setControlsEnabled(false);
-        
-        /*editableListView.setItems(items);
-        editableListView.setCellFactory(TextFieldListCell.forListView());
-        editableListView.setEditable(true);
-        editableListView.setOnEditCommit(event -> {
-            int index = event.getIndex();
-            String newValue = event.getNewValue();
-            items.set(index, newValue);
-        });*/
-
     }
 
     @FXML
@@ -176,6 +165,7 @@ public class Controller {
             playerService.setMedia(media);
             appendFileNameToTitle(Model.getFileName());
             setupPlayerListeners();
+            // playerService.loadMetaData();
             setupModelUIBindings();
             setupChangeListeners();
         }
@@ -275,7 +265,6 @@ public class Controller {
         // Bind the ViewModel to the UI controls
         Bindings.bindBidirectional(albumArtist.textProperty(), Model.getCurrentAlbum().albumArtistProperty());
         Bindings.bindBidirectional(albumTitle.textProperty(), Model.getCurrentAlbum().albumTitleProperty());
-        Bindings.bindBidirectional(albumSubtitle.textProperty(), Model.getCurrentAlbum().albumSubtitleProperty());
         Bindings.bindBidirectional(albumDate.textProperty(), Model.getCurrentAlbum().albumDateProperty());
         Bindings.bindBidirectional(albumEpisode.textProperty(), Model.getCurrentAlbum().albumEpisodeProperty());
         // Bindings.bindContentBidirectional(dataTableView.getItems(), viewModel.getAlbumTracks());
@@ -290,10 +279,7 @@ public class Controller {
         albumTitle.textProperty().addListener((observable, oldValue, newValue) -> onContentEdited());
         albumSubtitle.textProperty().addListener((observable, oldValue, newValue) -> onContentEdited());
         albumDate.textProperty().addListener((observable, oldValue, newValue) -> onContentEdited());
-        albumEpisode.textProperty().addListener((observable, oldValue, newValue) -> {
-            onContentEdited();
-            Model.getCurrentAlbum().validateEpisode(new Alert(AlertType.NONE));
-        });
+        albumEpisode.textProperty().addListener((observable, oldValue, newValue) -> onContentEdited());
 
         trackArtist.textProperty().addListener((observable, oldValue, newValue) -> onContentEdited());
         trackTitle.textProperty().addListener((observable, oldValue, newValue) -> onContentEdited());

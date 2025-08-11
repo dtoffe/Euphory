@@ -13,8 +13,6 @@ import java.io.File;
 import java.io.IOException;
 import org.github.euphory.Main;
 import org.github.euphory.model.Model;
-import org.github.euphory.tags.AudioTagFormat;
-import org.github.euphory.tags.AudioTagDetector;
 
 import javafx.scene.control.Alert;
 import javafx.scene.media.Media;
@@ -54,8 +52,4 @@ public class FileService {
 //        }
     }
 
-    public static AudioTagFormat detectTagFormat(File audioFile) throws IOException {
-        return AudioTagDetector.detectTagFormat(audioFile);
-    }   
-    
 }
