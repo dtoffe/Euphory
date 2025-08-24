@@ -17,7 +17,7 @@ import javafx.scene.media.Media;
  * @author Daniel Toffetti
  *
  * The Model class provides access to the application's data. It acts as a
- * central point for managing the current media file and album data.
+ * central point for managing the current media file and mix data.
  */
 public class Model {
 
@@ -27,9 +27,9 @@ public class Model {
     private static File currentFile;
 
     /**
-     * The current album data.
+     * The current mix data.
      */
-    private static AlbumDataViewModel currentAlbum;
+    private static MixDataViewModel currentMix;
 
     /**
      * Private constructor to prevent instantiation.
@@ -80,24 +80,24 @@ public class Model {
     }
 
     /**
-     * Sets the current album data.
+     * Sets the current mix data.
      *
-     * @param album The album data to set.
+     * @param mix The mix data to set.
      */
-    public static void setCurrentAlbum(AlbumDataViewModel album) {
-        currentAlbum = album;
+    public static void setCurrentMix(MixDataViewModel mix) {
+        currentMix = mix;
     }
 
     /**
-     * Gets the current album data.
+     * Gets the current mix data.
      *
-     * @return The current album data.  If no album data exists, a new one is created.
+     * @return The current mix data.  If no mix data exists, a new one is created.
      */
-    public static AlbumDataViewModel getCurrentAlbum() {
-        if (currentAlbum == null) {
-            currentAlbum = new AlbumDataViewModel();
+    public static MixDataViewModel getCurrentMix() {
+        if (currentMix == null) {
+            currentMix = new MixDataViewModel();
         }
-        return currentAlbum;
+        return currentMix;
     }
     
 }

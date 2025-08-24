@@ -39,6 +39,42 @@
     -fx-fill: black;
 }
 
+/* TabPane */
+.tab-pane {
+    -fx-background-color: #d1c4e9; /* Light purple background */
+    -fx-border-color: #90caf9; /* Light blue border */
+    -fx-border-width: 1px;
+}
+
+/* Tab */
+.tab {
+    -fx-background-color: #e0f7fa; /* Light blue background */
+    -fx-text-fill: #37474f; /* Dark blue text */
+    -fx-border-color: #90caf9; /* Light blue border */
+    -fx-border-width: 1px;
+    -fx-padding: 5px;
+}
+
+.tab:selected {
+    -fx-background-color: #64b5f6; /* Slightly darker blue on selection */
+}
+
+.tab:hover {
+    -fx-background-color: #64b5f6; /* Slightly darker blue on hover */
+}
+
+.tab-header-background {
+    -fx-background-color: #d1c4e9; /* Light purple background */
+}
+
+.tab-header-area {
+    -fx-background-color: #e0f7fa; /* Light blue background */
+}
+
+.tab-content-area {
+    -fx-background-color: #e0f7fa; /* Light blue background */
+}
+
 .button:hover {
     -fx-background-color: #64b5f6; /* Slightly darker blue on hover */
 }

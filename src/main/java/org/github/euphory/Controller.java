@@ -23,6 +23,7 @@ import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -79,6 +80,9 @@ public class Controller {
     private Slider songSlider;
     
     @FXML
+    private TabPane tabPane;
+
+    @FXML
     private Canvas waveFormsCanvas;
     
     @FXML
@@ -88,19 +92,16 @@ public class Controller {
     private HBox metaDataBox;
     
     @FXML
-    private TextField albumArtist;
+    private TextField mixName;
 
     @FXML
-    private TextField albumTitle;
+    private TextField mixAuthor;
 
     @FXML
-    private TextField albumSubtitle;
+    private TextField mixEpisode;
 
     @FXML
-    private TextField albumEpisode;
-
-    @FXML
-    private TextField albumDate;
+    private TextField mixDate;
 
     @FXML
     private TableView<TrackDataViewModel> dataTableView;
@@ -237,11 +238,11 @@ public class Controller {
     private void handleAddTrack(ActionEvent actionEvent) {
         String artist = trackArtist.getText();
         String title = trackTitle.getText();
-        int track = Integer.parseInt(trackNumber.getText());
+        String track = trackNumber.getText();
         int time = Integer.parseInt(startTime.getText());
     
         // Create a new Song object
-        TrackDataViewModel newTrack = new TrackDataViewModel(artist, title, track, time);
+        TrackDataViewModel newTrack = new TrackDataViewModel(track, time, artist, title);
         
         // Add to the TableView
         dataTableView.getItems().add(newTrack);
@@ -263,10 +264,10 @@ public class Controller {
     
     private void setupModelUIBindings() {
         // Bind the ViewModel to the UI controls
-        Bindings.bindBidirectional(albumArtist.textProperty(), Model.getCurrentAlbum().albumArtistProperty());
-        Bindings.bindBidirectional(albumTitle.textProperty(), Model.getCurrentAlbum().albumTitleProperty());
-        Bindings.bindBidirectional(albumDate.textProperty(), Model.getCurrentAlbum().albumDateProperty());
-        Bindings.bindBidirectional(albumEpisode.textProperty(), Model.getCurrentAlbum().albumEpisodeProperty());
+        Bindings.bindBidirectional(mixAuthor.textProperty(), Model.getCurrentMix().mixAuthorProperty());
+        Bindings.bindBidirectional(mixName.textProperty(), Model.getCurrentMix().mixNameProperty());
+        Bindings.bindBidirectional(mixDate.textProperty(), Model.getCurrentMix().mixDateProperty());
+        Bindings.bindBidirectional(mixEpisode.textProperty(), Model.getCurrentMix().mixEpisodeProperty());
         // Bindings.bindContentBidirectional(dataTableView.getItems(), viewModel.getAlbumTracks());
         // Bindings.bindBidirectional(coverImageView.imageProperty(), viewModel.coverImageProperty());
     }
@@ -275,11 +276,10 @@ public class Controller {
 
         coverImageView.imageProperty().addListener((observable, oldValue, newValue) -> onContentEdited());
 
-        albumArtist.textProperty().addListener((observable, oldValue, newValue) -> onContentEdited());
-        albumTitle.textProperty().addListener((observable, oldValue, newValue) -> onContentEdited());
-        albumSubtitle.textProperty().addListener((observable, oldValue, newValue) -> onContentEdited());
-        albumDate.textProperty().addListener((observable, oldValue, newValue) -> onContentEdited());
-        albumEpisode.textProperty().addListener((observable, oldValue, newValue) -> onContentEdited());
+        mixAuthor.textProperty().addListener((observable, oldValue, newValue) -> onContentEdited());
+        mixName.textProperty().addListener((observable, oldValue, newValue) -> onContentEdited());
+        mixDate.textProperty().addListener((observable, oldValue, newValue) -> onContentEdited());
+        mixEpisode.textProperty().addListener((observable, oldValue, newValue) -> onContentEdited());
 
         trackArtist.textProperty().addListener((observable, oldValue, newValue) -> onContentEdited());
         trackTitle.textProperty().addListener((observable, oldValue, newValue) -> onContentEdited());

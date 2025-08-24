@@ -12,7 +12,7 @@ package org.github.euphory.service;
 import java.util.Map;
 import java.io.RandomAccessFile;
 import org.github.euphory.tags.MP4TagManager;
-import org.github.euphory.model.AlbumDataViewModel;
+import org.github.euphory.model.MixDataViewModel;
 import org.github.euphory.model.TrackDataViewModel;
 
 public class TagService {
@@ -21,15 +21,15 @@ public class TagService {
         
     }
 
-    public AlbumDataViewModel populateAlbumDataViewModel(String filePath) {
-        AlbumDataViewModel albumDataViewModel = new AlbumDataViewModel();
+    public MixDataViewModel populateAlbumDataViewModel(String filePath) {
+        MixDataViewModel albumDataViewModel = new MixDataViewModel();
         try (RandomAccessFile file = new RandomAccessFile(filePath, "r")) {
             Map<String, String> tags = MP4TagManager.readMP4Tag(file);
 
-            albumDataViewModel.albumTitleProperty().set(tags.getOrDefault("title", ""));
-            albumDataViewModel.albumArtistProperty().set(tags.getOrDefault("artist", ""));
-            albumDataViewModel.albumEpisodeProperty().set(tags.getOrDefault("episode", ""));
-            albumDataViewModel.albumDateProperty().set(tags.getOrDefault("date", ""));
+            albumDataViewModel.mixNameProperty().set(tags.getOrDefault("title", ""));
+            albumDataViewModel.mixAuthorProperty().set(tags.getOrDefault("artist", ""));
+            albumDataViewModel.mixEpisodeProperty().set(tags.getOrDefault("episode", ""));
+            albumDataViewModel.mixDateProperty().set(tags.getOrDefault("date", ""));
 
             // Add additional tags not represented by fields
             tags.remove("title");
@@ -54,7 +54,7 @@ public class TagService {
 
             trackDataViewModel.trackTitleProperty().set(tags.getOrDefault("title", ""));
             trackDataViewModel.trackArtistProperty().set(tags.getOrDefault("artist", ""));
-            trackDataViewModel.trackNumberProperty().set(Integer.parseInt(tags.getOrDefault("track", "0")));
+            trackDataViewModel.trackNumberProperty().set(tags.getOrDefault("track", "0"));
             trackDataViewModel.startTimeProperty().set(Integer.parseInt(tags.getOrDefault("starttime", "0")));
 
             // Add additional tags not represented by fields

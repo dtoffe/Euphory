@@ -25,6 +25,16 @@ import javafx.beans.property.StringProperty;
 public class TrackDataViewModel {
 
     /**
+     * The track number property.
+     */
+    private StringProperty trackNumber = new SimpleStringProperty();
+
+    /**
+     * The start time property.
+     */
+    private IntegerProperty startTime = new SimpleIntegerProperty();
+
+    /**
      * The track artist property.
      */
     private StringProperty trackArtist = new SimpleStringProperty();
@@ -35,17 +45,13 @@ public class TrackDataViewModel {
     private StringProperty trackTitle = new SimpleStringProperty();
 
     /**
-     * The track number property.
+     * The additional tags property.
      */
-    private IntegerProperty trackNumber = new SimpleIntegerProperty();
-    
-    /**
-     * The start time property.
-     */
-    private IntegerProperty startTime = new SimpleIntegerProperty();
-
     private Map<String, String> additionalTags;
 
+    /**
+     * Constructs a new TrackDataViewModel.
+     */
     public TrackDataViewModel() {
         this.additionalTags = new HashMap<>();
     }
@@ -53,17 +59,35 @@ public class TrackDataViewModel {
     /**
      * Constructs a new TrackDataViewModel.
      *
-     * @param artist      The artist of the track.
-     * @param title       The title of the track.
      * @param trackNumber The track number.
      * @param startTime   The start time of the track in seconds.
+     * @param artist      The artist of the track.
+     * @param title       The title of the track.
      */
-    public TrackDataViewModel(String artist, String title, int trackNumber, int startTime) {
+    public TrackDataViewModel(String trackNumber, int startTime, String artist, String title) {
         this();
-        this.trackArtist.set(artist);
-        this.trackTitle.set(title);
         this.trackNumber.set(trackNumber);
         this.startTime.set(startTime);
+        this.trackArtist.set(artist);
+        this.trackTitle.set(title);
+    }
+
+    /**
+     * Gets the track number property.
+     *
+     * @return The track number property.
+     */
+    public StringProperty trackNumberProperty() {
+        return trackNumber;
+    }
+
+    /**
+     * Gets the start time property.
+     *
+     * @return The start time property.
+     */
+    public IntegerProperty startTimeProperty() {
+        return startTime;
     }
 
     /**
@@ -85,27 +109,19 @@ public class TrackDataViewModel {
     }
 
     /**
-     * Gets the track number property.
+     * Gets the additional tags property.
      *
-     * @return The track number property.
+     * @return The additional tags property.
      */
-    public IntegerProperty trackNumberProperty() {
-        return trackNumber;
-    }
-
-    /**
-     * Gets the start time property.
-     *
-     * @return The start time property.
-     */
-    public IntegerProperty startTimeProperty() {
-        return startTime;
-    }
-
     public Map<String, String> getAdditionalTags() {
         return additionalTags;
     }
 
+    /**
+     * Sets the additional tags property.
+     *
+     * @param additionalTags The additional tags to set.
+     */
     public void setAdditionalTags(Map<String, String> additionalTags) {
         this.additionalTags = additionalTags;
     }
@@ -122,17 +138,38 @@ public class TrackDataViewModel {
         return String.format("%02d:%02d:%02d", hours, minutes, seconds);
     }
 
+    /**
+     * Adds a tag to the track.
+     *
+     * @param key   The key of the tag.
+     * @param value The value of the tag.
+     */
     public void addTag(String key, String value) {
         this.additionalTags.put(key, value);
     }
 
+    /**
+     * Gets a tag from the track.
+     *
+     * @param key The key of the tag.
+     * @return The value of the tag.
+     */
+    public String getTag(String key) {
+        return this.additionalTags.get(key);
+    }
+
+    /**
+     * Returns a string representation of the track data.
+     *
+     * @return A string representation of the track data.
+     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("Title: ").append(trackTitle).append("\n");
-        sb.append("Artist: ").append(trackArtist).append("\n");
         sb.append("Track: ").append(trackNumber).append("\n");
         sb.append("Time: ").append(startTime).append("\n");
+        sb.append("Artist: ").append(trackArtist).append("\n");
+        sb.append("Title: ").append(trackTitle).append("\n");
         sb.append("Additional Tags:\n");
         for (Map.Entry<String, String> entry : additionalTags.entrySet()) {
             sb.append("  ").append(entry.getKey()).append(": ").append(entry.getValue()).append("\n");

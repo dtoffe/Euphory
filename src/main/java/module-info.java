@@ -9,15 +9,15 @@
  */
 module org.github.euphory {
     requires java.logging;
-    requires transitive javafx.controls;
+    requires javafx.base;
     requires javafx.fxml;
-    requires transitive javafx.media;
-    requires transitive javafx.graphics;
     requires javafx.swing;
+    requires transitive javafx.controls;
+    requires transitive javafx.graphics;
+    requires transitive javafx.media;
     requires org.kordamp.ikonli.core;
     requires org.kordamp.ikonli.javafx;
     requires org.kordamp.ikonli.fontawesome5;
-    requires javafx.base;
 
     opens org.github.euphory to javafx.fxml;
     exports org.github.euphory;

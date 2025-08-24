@@ -10,7 +10,9 @@
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.Slider?>
 <?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.control.ToolBar?>
@@ -98,98 +100,123 @@
         
         <!-- Track slider -->
         <Slider fx:id="songSlider" />
-        
-        <!-- Waveforms Pane -->
-        <Pane fx:id="waveformsPane" VBox.vgrow="ALWAYS" styleClass="waveforms-pane">
-            <Canvas fx:id="waveFormsCanvas" width="300" height="200" />
-        </Pane>
+            
+        <TabPane prefHeight="200.0" prefWidth="400.0" tabClosingPolicy="UNAVAILABLE">
+            <tabs>
+                <Tab text="Summary">
+                <content>
 
-        <!-- Album (Show Episode) metadata -->
-        <HBox fx:id="metaDataBox" prefHeight="350" VBox.vgrow="NEVER" spacing="10">
+                    <!-- Album (Show Episode) metadata -->
+                    <HBox fx:id="metaDataBox" prefHeight="500" VBox.vgrow="NEVER" spacing="10">
 
-            <!-- Cover Image -->
-            <Pane fx:id="coverPane" prefWidth="350" prefHeight="350" HBox.hgrow="NEVER">
-                <ImageView fx:id="coverImageView" fitWidth="350" fitHeight="350" preserveRatio="true" />
-            </Pane>
+                        <!-- Metadata Section -->
+                        <VBox spacing="10" alignment="TOP_LEFT" HBox.hgrow="ALWAYS">
+                            <HBox spacing="10">
+                                <Label text="Mix Name:"/>
+                                <TextField fx:id="mixName" prefWidth="280" promptText="Enter mix name" />
+                            </HBox>
+                            <HBox spacing="10">
+                                <Label text="Mix Author:"/>
+                                <TextField fx:id="mixAuthor" prefWidth="280" promptText="Enter mix author" />
+                            </HBox>
+                            <HBox spacing="10">
+                                <Label text="Episode #:"/>
+                                <TextField fx:id="mixEpisode" prefWidth="80" promptText="Ep. #" />
+                                <Label text="Date:"/>
+                                <TextField fx:id="mixDate" prefWidth="150" promptText="Enter mix date (yyyy-mm-dd)" />
+                            </HBox>
+                            <Separator orientation="HORIZONTAL" />
 
-            <!-- Metadata Section -->
-            <VBox spacing="10" alignment="TOP_LEFT" HBox.hgrow="ALWAYS">
-                <HBox spacing="10">
-                    <Label text="Album Artist:"/>
-                    <TextField fx:id="albumArtist" prefWidth="300" promptText="Enter album artist" />
-                </HBox>
-                <HBox spacing="10">
-                    <Label text="Album Title:"/>
-                    <TextField fx:id="albumTitle" prefWidth="300" promptText="Enter album title" />
-                </HBox>
-                <HBox spacing="10">
-                    <Label text="Episode #:"/>
-                    <TextField fx:id="albumEpisode" prefWidth="50" promptText="Ep. #" />
-                    <Label text="Date:"/>
-                    <TextField fx:id="albumDate" prefWidth="100" promptText="Enter date (yyyy-mm-dd)" />
-                </HBox>
+                            <!-- Cover Image -->
+                            <Pane fx:id="coverPane" prefWidth="350" prefHeight="350" HBox.hgrow="NEVER">
+                                <ImageView fx:id="coverImageView" fitWidth="350" fitHeight="350" preserveRatio="true" />
+                            </Pane>
+
+                        </VBox>
+
+                        <!-- Tracks Metadata -->
+                        <VBox spacing="10" alignment="TOP_LEFT" HBox.hgrow="ALWAYS">
+                            <HBox spacing="10">
+                                <Label text="Track Artist:"/>
+                                <TextField fx:id="trackArtist" prefWidth="300" promptText="Enter track artist" />
+                            </HBox>
+                            <HBox spacing="10">
+                                <Label text="Track Title:"/>
+                                <TextField fx:id="trackTitle" prefWidth="300" promptText="Enter track title" />
+                            </HBox>
+                            <HBox spacing="10">
+                                <Label text="Track #:"/>
+                                <TextField fx:id="trackNumber" prefWidth="50" promptText="Tr. #" />
+                                <Label text="Enter Start Time:"/>
+                                <TextField fx:id="startTime" prefWidth="100" promptText="Enter start time" />
+                                <Button text="Add Track" onAction="#handleAddTrack" />
+                            </HBox>
+                        </VBox>
+
+                    </HBox>
+                    
+                </content>
+                </Tab>
+
+                <Tab text="Tag Edition">
+                <content>
                 
-                <Separator orientation="HORIZONTAL" />
+                    <!-- Tracks Section -->
+                    <VBox spacing="10" alignment="TOP_LEFT" HBox.hgrow="ALWAYS">
+                        <TableView fx:id="dataTableView" prefHeight="200" prefWidth="700">
+                            <columns>
+                                <!-- Artist Column -->
+                                <TableColumn fx:id="artistColumn" text="Artist" prefWidth="300">
+                                    <cellValueFactory>
+                                        <PropertyValueFactory property="artist"/>
+                                    </cellValueFactory>
+                                </TableColumn>
 
-                <!-- Tracks Metadata -->
-                <HBox spacing="10">
-                    <Label text="Track Artist:"/>
-                    <TextField fx:id="trackArtist" prefWidth="300" promptText="Enter track artist" />
-                </HBox>
-                <HBox spacing="10">
-                    <Label text="Track Title:"/>
-                    <TextField fx:id="trackTitle" prefWidth="300" promptText="Enter track title" />
-                </HBox>
-                <HBox spacing="10">
-                    <Label text="Track #:"/>
-                    <TextField fx:id="trackNumber" prefWidth="50" promptText="Tr. #" />
-                    <Label text="Enter Start Time:"/>
-                    <TextField fx:id="startTime" prefWidth="100" promptText="Enter start time" />
-                    <Button text="Add Track" onAction="#handleAddTrack" />
-                </HBox>
-            </VBox>
+                                <!-- Title Column -->
+                                <TableColumn fx:id="titleColumn" text="Title" prefWidth="300">
+                                    <cellValueFactory>
+                                        <PropertyValueFactory property="title"/>
+                                    </cellValueFactory>
+                                </TableColumn>
 
-            <!-- Tracks Section -->
-            <VBox spacing="10" alignment="TOP_LEFT" HBox.hgrow="ALWAYS">
-                <TableView fx:id="dataTableView" prefHeight="200" prefWidth="700">
-                    <columns>
-                        <!-- Artist Column -->
-                        <TableColumn fx:id="artistColumn" text="Artist" prefWidth="300">
-                            <cellValueFactory>
-                                <PropertyValueFactory property="artist"/>
-                            </cellValueFactory>
-                        </TableColumn>
+                                <!-- Track Number Column -->
+                                <TableColumn fx:id="trackNumberColumn" text="Track" prefWidth="50">
+                                    <cellValueFactory>
+                                        <PropertyValueFactory property="trackNumber"/>
+                                    </cellValueFactory>
+                                </TableColumn>
 
-                        <!-- Title Column -->
-                        <TableColumn fx:id="titleColumn" text="Title" prefWidth="300">
-                            <cellValueFactory>
-                                <PropertyValueFactory property="title"/>
-                            </cellValueFactory>
-                        </TableColumn>
+                                <!-- Start Time Column -->
+                                <TableColumn fx:id="startTimeColumn" text="Start" prefWidth="50">
+                                    <cellValueFactory>
+                                        <PropertyValueFactory property="startTime"/>
+                                    </cellValueFactory>
+                                </TableColumn>
+                            </columns>
 
-                        <!-- Track Number Column -->
-                        <TableColumn fx:id="trackNumberColumn" text="Track" prefWidth="50">
-                            <cellValueFactory>
-                                <PropertyValueFactory property="trackNumber"/>
-                            </cellValueFactory>
-                        </TableColumn>
+                            <!-- Placeholder for empty table -->
+                            <placeholder>
+                                <Label text="No items yet" />
+                            </placeholder>
+                        </TableView>
+                    </VBox>
 
-                        <!-- Start Time Column -->
-                        <TableColumn fx:id="startTimeColumn" text="Start" prefWidth="50">
-                            <cellValueFactory>
-                                <PropertyValueFactory property="startTime"/>
-                            </cellValueFactory>
-                        </TableColumn>
-                    </columns>
+                </content>
+                </Tab>
 
-                    <!-- Placeholder for empty table -->
-                    <placeholder>
-                        <Label text="No items yet" />
-                    </placeholder>
-                </TableView>
-            </VBox>
+                <Tab text="Audio Analysis">
+                <content>
+                    
+                    <!-- Waveforms Pane -->
+                    <Pane fx:id="waveformsPane" VBox.vgrow="ALWAYS" styleClass="waveforms-pane">
+                        <Canvas fx:id="waveFormsCanvas" width="300" height="100" />
+                    </Pane>
 
-        </HBox>
+                </content>
+                </Tab>
+            </tabs>
+        </TabPane>
+
     </children>
     <padding>
         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
